@@ -18,7 +18,7 @@ body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
     color: var(--gris-oscuro);
-    background-color: var(--blanco); /* Fondo blanco por defecto */
+    background-color: var(--blanco); 
 }
 
 a {
