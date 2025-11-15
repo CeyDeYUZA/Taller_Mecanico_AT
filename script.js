@@ -1,13 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Smooth scrolling para enlaces de ancla (ej. #contacto)
-    // Se aplica a todos los enlaces que empiezan con #
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
             
-            // Verifica si el enlace es solo un # o si el elemento existe
             if (targetId.length > 1 && document.querySelector(targetId)) {
                 document.querySelector(targetId).scrollIntoView({
                     behavior: 'smooth'
@@ -61,61 +59,73 @@ document.addEventListener('DOMContentLoaded', () => {
         filtroCategoria.addEventListener('change', filtrarRepuestos);
     }
 
-    // 3. Lógica para el toggle de Login/Registro y Simulación de Acceso Administrativo (Necesita elementos en cuenta.html)
-    const showLoginBtn = document.getElementById('show-login-btn');
-    const showRegisterBtn = document.getElementById('show-register-btn');
-    const loginFormContainer = document.getElementById('login-form');
-    const registerFormContainer = document.getElementById('register-form');
+    // -----------------------------------------------------------
+    // 3. Lógica para el toggle de Login/Registro y Acceso
+    // -----------------------------------------------------------
     
-    // Necesitamos el formulario de login para manejar el submit
+    // Elementos del Toggle de formularios
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const switchToRegisterLink = document.getElementById('switch-to-register'); 
+    const switchToLoginLink = document.getElementById('switch-to-login'); 
+
+    if (loginForm && registerForm) {
+        
+        function showForm(formToShow, formToHide) {
+            formToShow.classList.add('active');
+            formToHide.classList.remove('active');
+            formToShow.style.display = 'block'; 
+            formToHide.style.display = 'none'; 
+        }
+
+        // Listener para ir a REGISTRO
+        if (switchToRegisterLink) {
+            switchToRegisterLink.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                showForm(registerForm, loginForm); 
+            });
+        }
+        
+        // Listener para ir a LOGIN
+        if (switchToLoginLink) {
+            switchToLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showForm(loginForm, registerForm);
+            });
+        }
+        
+        // Inicialización
+        showForm(loginForm, registerForm);
+    }
+    
+    // Elementos del Formulario de Login para el submit
     const loginFormSubmit = document.querySelector('#login-form form');
+    
+    // ✅ CORRECCIÓN DE IDS: Usamos los IDs reales del HTML
     const emailInput = document.getElementById('login-email');
-    const passwordInput = document.getElementById('login-pass');
+    const passwordInput = document.getElementById('login-password'); 
 
     // --- Variables de Simulación de Administrador ---
     const ADMIN_EMAIL = 'admin@taller.com'; 
-    const ADMIN_PASS = '1234'; // La contraseña simulada
+    const ADMIN_PASS = '1234'; 
 
-    // Comprobamos que los elementos del Login/Registro existan
-    if (showLoginBtn && showRegisterBtn && loginFormContainer && registerFormContainer) {
-        
-        // A. Lógica de Toggling 
-        showLoginBtn.addEventListener('click', () => {
-            loginFormContainer.classList.add('active');
-            registerFormContainer.classList.remove('active');
+    // Lógica de Simulación de Acceso Administrativo/Usuario
+    if (loginFormSubmit && emailInput && passwordInput) {
+        loginFormSubmit.addEventListener('submit', function(e) {
+            e.preventDefault(); 
             
-            showLoginBtn.classList.add('active');
-            showRegisterBtn.classList.remove('active');
-        });
+            const enteredEmail = emailInput.value.trim();
+            const enteredPass = passwordInput.value.trim();
 
-        showRegisterBtn.addEventListener('click', () => {
-            loginFormContainer.classList.remove('active');
-            registerFormContainer.classList.add('active');
-            
-            showLoginBtn.classList.remove('active');
-            showRegisterBtn.classList.add('active');
+            if (enteredEmail === ADMIN_EMAIL && enteredPass === ADMIN_PASS) {
+                // Acceso de Administrador: Redirigir al Dashboard
+                alert('Acceso de Administrador simulado exitoso. Redirigiendo a Dashboard...');
+                window.location.href = 'admin-dashboard.html'; 
+            } else {
+                // Acceso de Usuario Normal: Simulación
+                alert('Ingreso de usuario normal simulado. ¡Bienvenido!');
+                window.location.href = 'perfil-usuario.html';
+            }
         });
-        
-        // B. Lógica de Simulación de Acceso Administrativo 
-        if (loginFormSubmit) {
-            loginFormSubmit.addEventListener('submit', function(e) {
-                e.preventDefault(); // Detiene el envío normal del formulario
-                
-                const enteredEmail = emailInput.value.trim();
-                const enteredPass = passwordInput.value.trim();
-
-                if (enteredEmail === ADMIN_EMAIL && enteredPass === ADMIN_PASS) {
-                    // Acceso de Administrador: Redirigir al Dashboard
-                    alert('Acceso de Administrador simulado exitoso. Redirigiendo a Dashboard...');
-                    // Redirección simulada
-                    // window.location.href = 'admin-dashboard.html'; 
-                } else {
-                    // Acceso de Usuario Normal: Simulación
-                    alert('Ingreso de usuario normal simulado. ¡Bienvenido!');
-                    // Redirección simulada
-                    // window.location.href = 'perfil-usuario.html';
-                }
-            });
-        }
     }
 });

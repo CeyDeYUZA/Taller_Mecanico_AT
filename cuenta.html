@@ -111,16 +111,16 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
+            // -----------------------------------------------------------
+            // 1. Lógica para el toggle de Login/Registro 
+            // -----------------------------------------------------------
             const loginForm = document.getElementById('login-form');
             const registerForm = document.getElementById('register-form');
-            
-            // Enlaces de cambio de vista
             const switchToRegisterLink = document.getElementById('switch-to-register'); 
             const switchToLoginLink = document.getElementById('switch-to-login'); 
             
             if (loginForm && registerForm) {
                 
-                // Función simple para mostrar un formulario y ocultar otro
                 function showForm(formToShow, formToHide) {
                     formToShow.classList.add('active');
                     formToHide.classList.remove('active');
@@ -128,15 +128,15 @@
                     formToHide.style.display = 'none'; 
                 }
 
-                // 1. Listener para ir a REGISTRO (desde el Login)
+                // Listener para ir a REGISTRO (desde el Login)
                 if (switchToRegisterLink) {
                     switchToRegisterLink.addEventListener('click', (e) => {
-                        e.preventDefault(); // Evita que la página salte
+                        e.preventDefault(); 
                         showForm(registerForm, loginForm); 
                     });
                 }
                 
-                // 2. Listener para ir a LOGIN (desde el Registro)
+                // Listener para ir a LOGIN (desde el Registro)
                 if (switchToLoginLink) {
                     switchToLoginLink.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -147,7 +147,40 @@
                 // Inicialización al cargar la página (Mostrar Login por defecto)
                 showForm(loginForm, registerForm);
             }
+
+            // -----------------------------------------------------------
+            // 2. Lógica de Simulación de Acceso Administrativo/Usuario
+            // -----------------------------------------------------------
+            const loginFormSubmit = document.querySelector('#login-form form');
+            
+            // ✅ CORRECCIÓN DE IDS: Usamos los IDs reales del HTML
+            const emailInput = document.getElementById('login-email');
+            const passwordInput = document.getElementById('login-password'); 
+
+            // --- Variables de Simulación de Administrador ---
+            const ADMIN_EMAIL = 'admin@taller.com'; 
+            const ADMIN_PASS = '1234'; 
+
+            if (loginFormSubmit && emailInput && passwordInput) {
+                loginFormSubmit.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Detiene el envío del formulario
+                    
+                    const enteredEmail = emailInput.value.trim();
+                    const enteredPass = passwordInput.value.trim();
+
+                    if (enteredEmail === ADMIN_EMAIL && enteredPass === ADMIN_PASS) {
+                        // Acceso de Administrador: Redirigir al Dashboard
+                        alert('Acceso de Administrador simulado exitoso. Redirigiendo a Dashboard...');
+                        window.location.href = 'admin-dashboard.html'; 
+                    } else {
+                        // Acceso de Usuario Normal: Simulación
+                        alert('Ingreso de usuario normal simulado. ¡Bienvenido!');
+                        window.location.href = 'perfil-usuario.html';
+                    }
+                });
+            }
         });
     </script>
+    
 </body>
 </html>
