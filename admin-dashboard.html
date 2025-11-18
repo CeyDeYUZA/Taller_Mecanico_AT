@@ -1,345 +1,1020 @@
 <!DOCTYPE html>
-
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Taller AT</title>
+    <style>
+        /* RESET GLOBAL */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <title>Dashboard Administrativo - Taller AT</title>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
 
-    <link rel="stylesheet" href="style.css" />
+        /* LAYOUT PRINCIPAL */
+        .admin-body {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-    <link rel="icon" href="assets/img/LOGO.png" type="image/png" />
-  </head>
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            background-color: #003366;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            flex-shrink: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
 
-  <body class="admin-body">
+        .logo-admin img {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+            flex: 1;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 5px;
+            position: relative;
+        }
+
+        .sidebar-nav a {
+            display: block;
+            color: white;
+            padding: 12px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: #ff6d2d;
+        }
+
+        /* SUBMENÚS */
+        .has-submenu {
+            position: relative;
+        }
+
+        .has-submenu > .main-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .has-submenu > .main-link::after {
+            content: '▼';
+            font-size: 0.6em;
+            transition: transform 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .has-submenu.open > .main-link::after {
+            transform: rotate(-180deg);
+        }
+
+        .submenu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background-color: rgba(255, 109, 45, 0.1);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out;
+            border-left: 3px solid #ff6d2d;
+        }
+
+        .has-submenu.open .submenu {
+            max-height: 800px;
+        }
+
+        .submenu li {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .submenu li a {
+            display: block;
+            padding: 10px 15px 10px 35px;
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .submenu li a:hover {
+            background-color: rgba(255, 109, 45, 0.3);
+            color: #ff6d2d;
+            padding-left: 40px;
+        }
+
+        /* LOGOUT */
+        .logout-link {
+            margin-top: auto;
+        }
+
+        .logout-link a {
+            background-color: #dc3545;
+        }
+
+        .logout-link a:hover {
+            background-color: #c82333;
+        }
+
+        /* MAIN CONTENT */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .dashboard-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 40px;
+            background-color: #f4f4f4;
+            width: 100%;
+        }
+
+        /* SECCIONES */
+        .dashboard-section {
+            display: none;
+        }
+
+        .dashboard-section.active {
+            display: block;
+        }
+
+        /* TÍTULOS */
+        h1 {
+            color: #003366;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #ff6d2d;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #003366;
+            margin: 20px 0 15px 0;
+        }
+
+        /* ESTADÍSTICAS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #003366;
+        }
+
+        .stat-box.alert {
+            border-left-color: #dc3545;
+        }
+
+        .stat-box .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #003366;
+        }
+
+        .stat-box .label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* TARJETAS */
+        .section-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        /* BOTONES */
+        .cta-button {
+            display: inline-block;
+            background-color: #003366;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .cta-button:hover {
+            background-color: #ff6d2d;
+        }
+
+        /* TABLAS */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .data-table th {
+            background-color: #003366;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .data-table a {
+            color: #ff6d2d;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .data-table a:hover {
+            text-decoration: underline;
+        }
+
+        /* FORMULARIOS */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff6d2d;
+            box-shadow: 0 0 5px rgba(255, 109, 45, 0.3);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .admin-body {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 200px;
+            }
+
+            main {
+                min-height: calc(100vh - 200px);
+            }
+
+            .dashboard-content {
+                padding: 20px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="admin-body">
     <header class="sidebar">
-      <div class="logo-admin">
-        <img src="assets/img/systmec-Photoroom.png" alt="Logo Taller" />
-      </div>
+        <div class="logo-admin">
+            <img src="assets/img/systmec-Photoroom.png" alt="Logo" onerror="this.style.display='none'">
+        </div>
 
-      <nav class="sidebar-nav">
-        <ul>
-          <li>
-            <a href="#inicio" class="active"
-              ><span class="icon"></span> Inicio</a
-            >
-          </li>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="javascript:void(0)" onclick="mostrarSeccion('inicio')">Inicio</a></li>
+                
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="main-link" onclick="toggleMenu(this)">Citas</a>
+                    <ul class="submenu">
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('citas-hoy')">Citas de Hoy</a></li>
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('citas-proximas')">Próximas Citas</a></li>
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('citas-crear')">Crear Cita</a></li>
+                    </ul>
+                </li>
 
-          <li>
-            <a href="#inventario"><span class="icon"></span> Inventario</a>
-          </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="main-link" onclick="toggleMenu(this)">Clientes</a>
+                    <ul class="submenu">
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('clientes-listar')">Lista de Clientes</a></li>
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('clientes-nuevo')">Registrar Cliente</a></li>
+                    </ul>
+                </li>
 
-          <li>
-            <a href="#reportes"><span class="icon"></span> Reportes y Ventas</a>
-          </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="main-link" onclick="toggleMenu(this)">Vehículos</a>
+                    <ul class="submenu">
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('vehiculos-listar')">Lista</a></li>
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('vehiculos-nuevo')">Registrar</a></li>
+                    </ul>
+                </li>
 
-          <li>
-            <a href="#citas"><span class="icon"></span> Citas Agendadas</a>
-          </li>
-          <li>
-            <a href="#proveedores"><span class="icon"></span> Proveedores</a>
-          </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="main-link" onclick="toggleMenu(this)">Productos</a>
+                    <ul class="submenu">
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('productos-listar')">Inventario</a></li>
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('productos-nuevo')">Agregar</a></li>
+                    </ul>
+                </li>
 
-        
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="main-link" onclick="toggleMenu(this)">Ventas</a>
+                    <ul class="submenu">
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('ventas-listar')">Registro</a></li>
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('ventas-nueva')">Nueva Venta</a></li>
+                    </ul>
+                </li>
 
-          <li class="logout-link">
-            <a href="logout"><span class="icon"></span> Cerrar Sesión</a>
-          </li>
-        </ul>
-      </nav>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="main-link" onclick="toggleMenu(this)">Compras</a>
+                    <ul class="submenu">
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('compras-listar')">Órdenes</a></li>
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('compras-nueva')">Nueva Orden</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="main-link" onclick="toggleMenu(this)">Usuarios</a>
+                    <ul class="submenu">
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('usuarios-listar')">Lista</a></li>
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('usuarios-nuevo')">Crear Usuario</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="main-link" onclick="toggleMenu(this)">Servicios</a>
+                    <ul class="submenu">
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('servicios-listar')">Lista</a></li>
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('servicios-nuevo')">Crear</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="main-link" onclick="toggleMenu(this)">Repuestos</a>
+                    <ul class="submenu">
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('repuestos-listar')">Catálogo</a></li>
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('repuestos-nuevo')">Agregar</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="main-link" onclick="toggleMenu(this)">Proveedores</a>
+                    <ul class="submenu">
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('proveedores-listar')">Lista</a></li>
+                        <li><a href="javascript:void(0)" onclick="mostrarSeccion('proveedores-nuevo')">Registrar</a></li>
+                    </ul>
+                </li>
+
+                <li class="logout-link">
+                    <a href="logout">Cerrar Sesión</a>
+                </li>
+            </ul>
+        </nav>
     </header>
 
     <main>
-      <div class="dashboard-content">
-        <section id="inicio" class="dashboard-section">
-          <h1>Panel de Gestión - Taller Mecánico AT</h1>
-
-          <div class="stats-grid">
-            <div class="stat-box">
-              <div class="number">5</div>
-
-              <div class="label">Citas Hoy</div>
-            </div>
-
-            <div class="stat-box alert">
-              <div class="number">3</div>
-
-              <div class="label">Stock Crítico</div>
-            </div>
-
-            <div class="stat-box">
-              <div class="number">Bs 1,250</div>
-
-              <div class="label">Ventas del Día</div>
-            </div>
-
-            <div class="stat-box">
-              <div class="number">9/10</div>
-
-              <div class="label">Satisfacción</div>
-            </div>
-          </div>
-
-          <div class="section-card">
-            <h2>Próximas Tareas</h2>
-
-            <p>
-              Revisar las órdenes de compra pendientes y confirmar las citas de
-              mañana.
-            </p>
-          </div>
-        </section>
-
-        <section
-          id="inventario"
-          class="dashboard-section"
-          style="display: none"
-        >
-          <h1>Gestión de Inventario</h1>
-
-          <a
-            href="admin-inventario-add.html"
-            class="cta-button"
-            style="margin-bottom: 20px"
-            >+ Añadir Nuevo Repuesto</a
-          >
-
-          <div class="section-card">
-            <h2>Stock Detallado</h2>
-
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-
-                  <th>Nombre</th>
-
-                  <th>Stock</th>
-
-                  <th>P. Venta</th>
-
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr>
-                  <td>R-001</td>
-
-                  <td>Filtro de Aceite (Modelo A)</td>
-
-                  <td>25</td>
-
-                  <td>Bs.15.00</td>
-
-                  <td>
-                    <a href="admin-inventario-add.html?id=R001">Editar</a> |
-                    <a href="#">Eliminar</a>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>R-002</td>
-
-                  <td>Pastillas de Freno (Set)</td>
-
-                  <td>
-                    <span style="color: var(--rojo-alerta); font-weight: bold"
-                      >4 (Bajo)</span
-                    >
-                  </td>
-
-                  <td>Bs.45.50</td>
-
-                  <td>
-                    <a href="admin-inventario-add.html?id=R002">Editar</a> |
-                    <a href="#">Eliminar</a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section
-          id="proveedores"
-          class="dashboard-section"
-          style="display: none"
-        >
-          <h1>Gestión de Proveedores</h1>
-
-          <a
-            href="admin-proveedores-add.html"
-            class="cta-button"
-            style="margin-bottom: 20px"
-            >+ Registrar Nuevo Proveedor</a
-          >
-
-          <div class="section-card">
-            <h2>Lista de Proveedores</h2>
-
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-
-                  <th>Contacto</th>
-
-                  <th>Teléfono</th>
-
-                  <th>Estado</th>
-
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr>
-                  <td>Mecánica Total Ltda.</td>
-
-                  <td>Ana Gómez</td>
-
-                  <td>555-1234</td>
-
-                  <td><span style="color: var(--verde-exito)">Activo</span></td>
-
-                  <td>
-                    <a
-                      href="admin-proveedores-add.html?id=P001"
-                      class="cta-link"
-                      >Editar</a
-                    >
-                    |
-
-                    <a
-                      href="orden-de-compra.html?proveedor=P001"
-                      class="cta-link btn-success"
-                      >Pedido</a
-                    >
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>Neumáticos Rápidos</td>
-
-                  <td>Carlos Ruiz</td>
-
-                  <td>555-5678</td>
-
-                  <td>Activo</td>
-
-                  <td>
-                    <a
-                      href="admin-proveedores-add.html?id=P002"
-                      class="cta-link"
-                      >Editar</a
-                    >
-                    |
-
-                    <a
-                      href="orden-de-compra.html?proveedor=P002"
-                      class="cta-link btn-success"
-                      >Pedido</a
-                    >
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section id="citas" class="dashboard-section" style="display: none">
-          <h1>Citas Agendadas</h1>
-
-          <div class="section-card">
-            <h2>Citas para Hoy (05/Nov/2025)</h2>
-
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Hora</th>
-
-                  <th>Cliente</th>
-
-                  <th>Vehículo</th>
-
-                  <th>Servicio</th>
-
-                  <th>Estado</th>
-
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr>
-                  <td>09:00</td>
-
-                  <td>Laura Díaz</td>
-
-                  <td>Toyota Corolla</td>
-
-                  <td>Diagnóstico</td>
-
-                  <td><span style="font-weight: bold">Pendiente</span></td>
-
-                  <td>
-                    <a href="admin-citas-view.html?id=C101">Ver Detalle</a>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>14:00</td>
-
-                  <td>Juan Pérez</td>
-
-                  <td>Honda Civic</td>
-
-                  <td>Frenos</td>
-
-                  <td>En Taller</td>
-
-                  <td>
-                    <a href="admin-citas-view.html?id=C102">Ver Detalle</a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section id="reportes" class="dashboard-section" style="display: none">
-          <h1>Reportes y Análisis de Ventas</h1>
-
-          <div class="section-card">
-            <h2>Reporte de Ventas por Servicio</h2>
-
-            <p>
-              Muestra un gráfico de barras (simulado) donde el cambio de aceite
-              domina las ventas.
-            </p>
-          </div>
-
-          <div class="section-card">
-            <h2>Stock Crítico</h2>
-
-            <p>
-              Generar un listado PDF con repuestos cuyo stock es inferior a 5
-              unidades.
-            </p>
-
-            <a href="#" class="cta-button" style="margin-top: 15px"
-              >Generar Reporte PDF</a
-            >
-          </div>
-        </section>
-      </div>
+        <div class="dashboard-content">
+            <!-- INICIO -->
+            <section id="inicio" class="dashboard-section active">
+                <h1>Panel Principal</h1>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="number">8</div>
+                        <div class="label">Citas Hoy</div>
+                    </div>
+                    <div class="stat-box alert">
+                        <div class="number">5</div>
+                        <div class="label">Stock Crítico</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number">Bs 2,540</div>
+                        <div class="label">Ventas Hoy</div>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <h2>Bienvenido al Sistema de Gestión</h2>
+                    <p>Taller Mecánico AT - Sistema Administrativo</p>
+                </div>
+            </section>
+
+            <!-- CITAS -->
+            <section id="citas-hoy" class="dashboard-section">
+                <h1>Citas de Hoy</h1>
+                <a href="javascript:void(0)" class="cta-button" onclick="mostrarSeccion('citas-crear')">+ Crear Cita</a>
+                <div class="section-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Cliente</th>
+                                <th>Vehículo</th>
+                                <th>Servicio</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>08:00</td>
+                                <td>Juan Pérez</td>
+                                <td>Toyota Corolla</td>
+                                <td>Cambio Aceite</td>
+                                <td><span style="color: green;">✓ Completado</span></td>
+                            </tr>
+                            <tr>
+                                <td>10:00</td>
+                                <td>María González</td>
+                                <td>Honda Civic</td>
+                                <td>Revisión Frenos</td>
+                                <td><span style="color: orange;">En Proceso</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="citas-proximas" class="dashboard-section">
+                <h1>Próximas Citas</h1>
+                <div class="section-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Cliente</th>
+                                <th>Servicio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>18/11/2025</td>
+                                <td>10:00</td>
+                                <td>Roberto Silva</td>
+                                <td>Alineación</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="citas-crear" class="dashboard-section">
+                <h1>Crear Nueva Cita</h1>
+                <div class="section-card">
+                    <form>
+                        <div class="form-group">
+                            <label>Cliente</label>
+                            <select><option>Seleccionar</option></select>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Fecha</label>
+                                <input type="date">
+                            </div>
+                            <div class="form-group">
+                                <label>Hora</label>
+                                <input type="time">
+                            </div>
+                        </div>
+                        <button type="button" class="cta-button">Guardar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- CLIENTES -->
+            <section id="clientes-listar" class="dashboard-section">
+                <h1>Lista de Clientes</h1>
+                <a href="javascript:void(0)" class="cta-button" onclick="mostrarSeccion('clientes-nuevo')">+ Nuevo Cliente</a>
+                <div class="section-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Citas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Juan Pérez</td>
+                                <td>555-0001</td>
+                                <td>juan@email.com</td>
+                                <td>8</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="clientes-nuevo" class="dashboard-section">
+                <h1>Registrar Nuevo Cliente</h1>
+                <div class="section-card">
+                    <form>
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" placeholder="Nombre completo">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Teléfono</label>
+                                <input type="tel">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email">
+                            </div>
+                        </div>
+                        <button type="button" class="cta-button">Guardar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- VEHÍCULOS -->
+            <section id="vehiculos-listar" class="dashboard-section">
+                <h1>Lista de Vehículos</h1>
+                <a href="javascript:void(0)" class="cta-button" onclick="mostrarSeccion('vehiculos-nuevo')">+ Registrar</a>
+                <div class="section-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Placa</th>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                                <th>Cliente</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>SAB-100</td>
+                                <td>Toyota</td>
+                                <td>Corolla</td>
+                                <td>Juan Pérez</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="vehiculos-nuevo" class="dashboard-section">
+                <h1>Registrar Vehículo</h1>
+                <div class="section-card">
+                    <form>
+                        <div class="form-group">
+                            <label>Placa</label>
+                            <input type="text">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Marca</label>
+                                <input type="text">
+                            </div>
+                            <div class="form-group">
+                                <label>Modelo</label>
+                                <input type="text">
+                            </div>
+                        </div>
+                        <button type="button" class="cta-button">Guardar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- PRODUCTOS -->
+            <section id="productos-listar" class="dashboard-section">
+                <h1>Inventario</h1>
+                <a href="javascript:void(0)" class="cta-button" onclick="mostrarSeccion('productos-nuevo')">+ Agregar</a>
+                <div class="section-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Stock</th>
+                                <th>Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>PRD-001</td>
+                                <td>Filtro Aceite</td>
+                                <td>25</td>
+                                <td>Bs. 15.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="productos-nuevo" class="dashboard-section">
+                <h1>Agregar Producto</h1>
+                <div class="section-card">
+                    <form>
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Precio</label>
+                                <input type="number" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Stock</label>
+                                <input type="number">
+                            </div>
+                        </div>
+                        <button type="button" class="cta-button">Guardar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- VENTAS -->
+            <section id="ventas-listar" class="dashboard-section">
+                <h1>Registro de Ventas</h1>
+                <a href="javascript:void(0)" class="cta-button" onclick="mostrarSeccion('ventas-nueva')">+ Nueva Venta</a>
+                <div class="section-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Factura</th>
+                                <th>Cliente</th>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>FAC-001</td>
+                                <td>Juan Pérez</td>
+                                <td>15/11/2025</td>
+                                <td>Bs. 120.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="ventas-nueva" class="dashboard-section">
+                <h1>Nueva Venta</h1>
+                <div class="section-card">
+                    <form>
+                        <div class="form-group">
+                            <label>Cliente</label>
+                            <select><option>Seleccionar</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Monto</label>
+                            <input type="number" step="0.01">
+                        </div>
+                        <button type="button" class="cta-button">Guardar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- COMPRAS -->
+            <section id="compras-listar" class="dashboard-section">
+                <h1>Órdenes de Compra</h1>
+                <a href="javascript:void(0)" class="cta-button" onclick="mostrarSeccion('compras-nueva')">+ Nueva Orden</a>
+                <div class="section-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Orden</th>
+                                <th>Proveedor</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ORD-001</td>
+                                <td>Mecánica Total</td>
+                                <td>15/11/2025</td>
+                                <td>Bs. 850.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="compras-nueva" class="dashboard-section">
+                <h1>Nueva Orden de Compra</h1>
+                <div class="section-card">
+                    <form>
+                        <div class="form-group">
+                            <label>Proveedor</label>
+                            <select><option>Seleccionar</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Producto</label>
+                            <input type="text">
+                        </div>
+                        <button type="button" class="cta-button">Guardar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- USUARIOS -->
+            <section id="usuarios-listar" class="dashboard-section">
+                <h1>Gestión de Usuarios</h1>
+                <a href="javascript:void(0)" class="cta-button" onclick="mostrarSeccion('usuarios-nuevo')">+ Crear Usuario</a>
+                <div class="section-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>admin</td>
+                                <td>admin@taller.com</td>
+                                <td>Administrador</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="usuarios-nuevo" class="dashboard-section">
+                <h1>Crear Usuario</h1>
+                <div class="section-card">
+                    <form>
+                        <div class="form-group">
+                            <label>Usuario</label>
+                            <input type="text">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email">
+                        </div>
+                        <button type="button" class="cta-button">Guardar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- SERVICIOS -->
+            <section id="servicios-listar" class="dashboard-section">
+                <h1>Servicios</h1>
+                <a href="javascript:void(0)" class="cta-button" onclick="mostrarSeccion('servicios-nuevo')">+ Crear</a>
+                <div class="section-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Tiempo Est.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Cambio Aceite</td>
+                                <td>Bs. 120.00</td>
+                                <td>30 min</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="servicios-nuevo" class="dashboard-section">
+                <h1>Crear Servicio</h1>
+                <div class="section-card">
+                    <form>
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Precio</label>
+                                <input type="number" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Tiempo (min)</label>
+                                <input type="number">
+                            </div>
+                        </div>
+                        <button type="button" class="cta-button">Guardar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- REPUESTOS -->
+            <section id="repuestos-listar" class="dashboard-section">
+                <h1>Catálogo de Repuestos</h1>
+                <a href="javascript:void(0)" class="cta-button" onclick="mostrarSeccion('repuestos-nuevo')">+ Agregar</a>
+                <div class="section-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Marca</th>
+                                <th>Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>REP-001</td>
+                                <td>Filtro Aire</td>
+                                <td>Bosch</td>
+                                <td>Bs. 45.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="repuestos-nuevo" class="dashboard-section">
+                <h1>Agregar Repuesto</h1>
+                <div class="section-card">
+                    <form>
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Marca</label>
+                                <input type="text">
+                            </div>
+                            <div class="form-group">
+                                <label>Precio</label>
+                                <input type="number" step="0.01">
+                            </div>
+                        </div>
+                        <button type="button" class="cta-button">Guardar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- PROVEEDORES -->
+            <section id="proveedores-listar" class="dashboard-section">
+                <h1>Proveedores</h1>
+                <a href="javascript:void(0)" class="cta-button" onclick="mostrarSeccion('proveedores-nuevo')">+ Registrar</a>
+                <div class="section-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Contacto</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Mecánica Total Ltda.</td>
+                                <td>Ana Gómez</td>
+                                <td>555-1234</td>
+                                <td>ana@mecanica.com</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="proveedores-nuevo" class="dashboard-section">
+                <h1>Registrar Proveedor</h1>
+                <div class="section-card">
+                    <form>
+                        <div class="form-group">
+                            <label>Nombre Empresa</label>
+                            <input type="text">
+                        </div>
+                        <div class="form-group">
+                            <label>Contacto</label>
+                            <input type="text">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Teléfono</label>
+                                <input type="tel">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email">
+                            </div>
+                        </div>
+                        <button type="button" class="cta-button">Guardar</button>
+                    </form>
+                </div>
+            </section>
+        </div>
     </main>
 
-    <script src="admin-dashboard.js"></script>
+    <script>
+        function mostrarSeccion(id) {
+            const secciones = document.querySelectorAll('.dashboard-section');
+            secciones.forEach(seccion => {
+                seccion.classList.remove('active');
+            });
 
-    <script src="script.js"></script>
-  </body>
+            const seccion = document.getElementById(id);
+            if (seccion) {
+                seccion.classList.add('active');
+            }
+
+            const dashboard = document.querySelector('.dashboard-content');
+            dashboard.scrollTop = 0;
+        }
+
+        function toggleMenu(element) {
+            const parent = element.parentElement;
+            
+            // Cerrar todos los menús abiertos excepto este
+            document.querySelectorAll('.has-submenu.open').forEach(menu => {
+                if (menu !== parent) {
+                    menu.classList.remove('open');
+                }
+            });
+            
+            // Toggle del menú actual
+            parent.classList.toggle('open');
+        }
+    </script>
+
+<script src="admin-dashboard.js"></script>
+
+
+<script src="script.js"></script> 
+</body>
+
 </html>
